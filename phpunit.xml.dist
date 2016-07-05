@@ -1,0 +1,23 @@
+<phpunit bootstrap="vendor/autoload.php" colors="true">
+  <testsuites>
+    <testsuite name="oauth1-xero">
+      <directory>tests</directory>
+    </testsuite>
+  </testsuites>
+
+  <listeners>
+      <listener class="\Mockery\Adapter\Phpunit\TestListener"></listener>
+  </listeners>
+
+  <logging>
+    <log type="coverage-clover" target="build/logs/clover.xml"/>
+    <log type="coverage-html" target="build/coverage" lowUpperBound="35" highLowerBound="70"/>
+    <log type="coverage-text" target="php://stdout" lowUpperBound="35" highLowerBound="70" showOnlySummary="true"/>
+  </logging>
+
+  <filter>
+    <whitelist addUncoveredFilesFromWhitelist="true">
+      <directory suffix=".php">src</directory>
+    </whitelist>
+  </filter>
+</phpunit>
