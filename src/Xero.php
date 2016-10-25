@@ -5,6 +5,7 @@ namespace Invoiced\OAuth1\Client\Server;
 use Exception;
 use League\OAuth1\Client\Credentials\TokenCredentials;
 use League\OAuth1\Client\Server\Server;
+use League\OAuth1\Client\Server\User;
 
 class Xero extends Server
 {
@@ -27,17 +28,36 @@ class Xero extends Server
 
     public function urlUserDetails()
     {
-        return $this->notSupportedByXero();
+        return 'https://api.xero.com/api.xro/2.0/organisation';
     }
 
     public function userDetails($data, TokenCredentials $tokenCredentials)
     {
-        return $this->notSupportedByXero();
+		$data = json_decode(json_encode($data),TRUE)['Organisations']['Organisation'];
+
+        if (!isset($data) || !is_array($data)) return;
+
+        $user = new User();
+        
+        $user->uid = $data['APIKey'];
+        $user->nickname = $data['Name'];
+        $user->name = $data['LegalName'];
+        $user->location = $data['CountryCode'];
+        $user->description = $data['LineOfBusiness'] . ' ' . $data['OrganisationEntityType'];
+        $user->imageUrl = null;
+        $user->email = null;
+
+        $used = array('APIKey', 'Name', 'LegalName', 'CountryCode', 'LineOfBusiness', 'OrganisationEntityType');
+
+        $user->extra = array_diff_key($data, array_flip($used));
+        return $user;
     }
 
     public function userUid($data, TokenCredentials $tokenCredentials)
     {
-        return $this->notSupportedByXero();
+        $data = json_decode(json_encode($data),TRUE)['Organisations']['Organisation'];
+        return $data['APIKey'];
+
     }
 
     public function userEmail($data, TokenCredentials $tokenCredentials)
@@ -47,7 +67,8 @@ class Xero extends Server
 
     public function userScreenName($data, TokenCredentials $tokenCredentials)
     {
-        return $this->notSupportedByXero();
+        $data = json_decode(json_encode($data),TRUE)['Organisations']['Organisation'];
+        return $data['Name'];
     }
 
     protected function notSupportedByXero()
