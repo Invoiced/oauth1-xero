@@ -4,17 +4,32 @@ use Invoiced\OAuth1\Client\Server\Xero;
 
 class XeroTest extends PHPUnit_Framework_TestCase
 {
+    public function testUsePartnerApi()
+    {
+        $server = $this->getServer();
+
+        $this->assertFalse($server->getUsePartnerApi());
+        $this->assertEquals($server, $server->usePartnerApi());
+        $this->assertTrue($server->getUsePartnerApi());
+    }
+
     public function testUrlTemporaryCredentials()
     {
         $server = $this->getServer();
 
         $this->assertEquals('https://api.xero.com/oauth/RequestToken', $server->urlTemporaryCredentials());
+
+        $server->usePartnerApi();
+        $this->assertEquals('https://api-partner.network.xero.com/oauth/RequestToken', $server->urlTemporaryCredentials());
     }
 
     public function testUrlAuthorization()
     {
         $server = $this->getServer();
 
+        $this->assertEquals('https://api.xero.com/oauth/Authorize', $server->urlAuthorization());
+
+        $server->usePartnerApi();
         $this->assertEquals('https://api.xero.com/oauth/Authorize', $server->urlAuthorization());
     }
 
@@ -23,6 +38,9 @@ class XeroTest extends PHPUnit_Framework_TestCase
         $server = $this->getServer();
 
         $this->assertEquals('https://api.xero.com/oauth/AccessToken', $server->urlTokenCredentials());
+
+        $server->usePartnerApi();
+        $this->assertEquals('https://api-partner.network.xero.com/oauth/AccessToken', $server->urlTokenCredentials());
     }
 
     public function testUserDetails()
