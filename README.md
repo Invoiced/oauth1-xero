@@ -29,10 +29,10 @@ Follows [Xero Public Applications](https://developer.xero.com/documentation/gett
 
 ```php
 $server = new Invoiced\OAuth1\Client\Server\Xero([
-    'identifier'   => 'your-identifier',
-    'secret'       => 'your-secret',
-    'callback_uri' => 'https://your-callback-uri/',
-    'partner'      => false,
+    'identifier'      => 'your-identifier',
+    'secret'          => 'your-secret',
+    'callback_uri'    => 'https://your-callback-uri/',
+    'partner'         => false,
 ]);
 ```
 
@@ -42,10 +42,12 @@ Follows [Xero Private Applications](https://developer.xero.com/documentation/get
 
 ```php
 $server = new Invoiced\OAuth1\Client\Server\Xero([
-    'identifier'   => 'your-identifier',
-    'secret'       => 'your-secret',
-    'callback_uri' => 'https://your-callback-uri/',
-    'partner'      => false,
+    'identifier'      => 'your-identifier',
+    'secret'          => 'your-secret',
+    'callback_uri'    => 'https://your-callback-uri/',
+    'partner'         => false,
+    'rsa_private_key' => '/path/private.pem',
+    'rsa_public_key'  => '/path/public.pem',
 ]);
 ```
 
@@ -55,11 +57,13 @@ Follows [Xero Partner Applications](https://developer.xero.com/documentation/get
 
 ```php
 $server = new Invoiced\OAuth1\Client\Server\Xero([
-    'identifier'   => 'your-identifier',
-    'secret'       => 'your-secret',
-    'callback_uri' => 'https://your-callback-uri/',
-    'partner'      => true,
-    'http_client'  => [
+    'identifier'      => 'your-identifier',
+    'secret'          => 'your-secret',
+    'callback_uri'    => 'https://your-callback-uri/',
+    'partner'         => true,
+    'rsa_private_key' => '/path/private.pem',
+    'rsa_public_key'  => '/path/public.pem',
+    'http_client'     => [
         'cert'     => '/path/entrust-cert.pem',
         'ssl_key'  => ['/path/entrust-private.pem', 'key-password'],
         // certificate verification would require installing Xero's certificate issuer to the trust store

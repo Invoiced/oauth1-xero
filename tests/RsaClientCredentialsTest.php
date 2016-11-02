@@ -1,0 +1,68 @@
+<?php
+
+use Invoiced\OAuth1\Client\Server\RsaClientCredentials;
+
+class RsaClientCredentialsTest extends PHPUnit_Framework_TestCase
+{
+    public function testGetRsaPublicKey()
+    {
+        $credentials = new RsaClientCredentials();
+        $credentials->setRsaPublicKey(__DIR__.'/test_rsa_publickey.pem');
+
+        $key = $credentials->getRsaPublicKey();
+        $this->assertTrue(is_resource($key));
+
+        $this->assertEquals($key, $credentials->getRsaPublicKey());
+    }
+
+    public function testGetRsaPublicKeyNotExists()
+    {
+        $this->setExpectedException('League\OAuth1\Client\Credentials\CredentialsException');
+
+        $credentials = new RsaClientCredentials();
+        $credentials->setRsaPublicKey('fail');
+
+        $credentials->getRsaPublicKey();
+    }
+
+    public function testGetRsaPublicKeyInvalid()
+    {
+        $this->setExpectedException('League\OAuth1\Client\Credentials\CredentialsException');
+
+        $credentials = new RsaClientCredentials();
+        $credentials->setRsaPublicKey(__DIR__.'/test_rsa_invalidkey.pem');
+
+        $credentials->getRsaPublicKey();
+    }
+
+    public function testGetRsaPrivateKey()
+    {
+        $credentials = new RsaClientCredentials();
+        $credentials->setRsaPrivateKey(__DIR__.'/test_rsa_privatekey.pem');
+
+        $key = $credentials->getRsaPrivateKey();
+        $this->assertTrue(is_resource($key));
+
+        $this->assertEquals($key, $credentials->getRsaPrivateKey());
+    }
+
+    public function testGetRsaPrivateKeyNotExists()
+    {
+        $this->setExpectedException('League\OAuth1\Client\Credentials\CredentialsException');
+
+        $credentials = new RsaClientCredentials();
+        $credentials->setRsaPrivateKey('fail');
+
+        $credentials->getRsaPrivateKey();
+    }
+
+    public function testGetRsaPrivateKeyInvalid()
+    {
+        $this->setExpectedException('League\OAuth1\Client\Credentials\CredentialsException');
+
+        $credentials = new RsaClientCredentials();
+        $credentials->setRsaPrivateKey(__DIR__.'/test_rsa_invalidkey.pem');
+
+        $credentials->getRsaPrivateKey();
+    }
+}

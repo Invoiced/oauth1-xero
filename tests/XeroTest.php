@@ -24,6 +24,26 @@ class XeroTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($client->getConfig('verify'));
     }
 
+    function testCredentialsWithRsa()
+    {
+        $config = [
+            'identifier' => 'app_key',
+            'secret' => 'secret',
+            'callback_uri' => 'https://example.com/callback',
+            'rsa_public_key' => __DIR__.'/test_rsa_publickey.pem',
+            'rsa_private_key' => __DIR__.'/test_rsa_privatekey.pem',
+        ];
+        $server = new Xero($config);
+
+        $credentials = $server->getClientCredentials();
+        $this->assertInstanceOf('Invoiced\OAuth1\Client\Server\RsaClientCredentials', $credentials);
+        $this->assertTrue(is_resource($credentials->getRsaPrivateKey()));
+        $this->assertTrue(is_resource($credentials->getRsaPublicKey()));
+
+        $signature = $server->getSignature();
+        $this->assertInstanceOf('Invoiced\OAuth1\Client\Server\RsaSha1Signature', $signature);
+    }
+
     public function testUrlTemporaryCredentials()
     {
         $server = $this->getServer();

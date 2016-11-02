@@ -4,6 +4,8 @@ namespace Invoiced\OAuth1\Client\Server;
 
 use Exception;
 use GuzzleHttp\Client as GuzzleHttpClient;
+use InvalidArgumentException;
+use League\OAuth1\Client\Credentials\ClientCredentials;
 use League\OAuth1\Client\Credentials\TokenCredentials;
 use League\OAuth1\Client\Server\Server;
 use League\OAuth1\Client\Signature\SignatureInterface;
@@ -30,11 +32,17 @@ class Xero extends Server
      */
     public function __construct($clientCredentials, SignatureInterface $signature = null)
     {
-        parent::__construct($clientCredentials, $signature);
-
         if (is_array($clientCredentials)) {
             $this->parseConfiguration($clientCredentials);
+
+            $clientCredentials = $this->createClientCredentials($clientCredentials);
+
+            if (!$signature && $clientCredentials instanceof RsaClientCredentials) {
+                $signature = new RsaSha1Signature($clientCredentials);
+            }
         }
+
+        parent::__construct($clientCredentials, $signature);
     }
 
     /**
@@ -140,5 +148,40 @@ class Xero extends Server
                 $this->$property = $configuration[$config];
             }
         }
+    }
+
+    /**
+     * Creates a client credentials instance from an array of credentials.
+     *
+     * @param array $clientCredentials
+     *
+     * @return ClientCredentials
+     */
+    protected function createClientCredentials(array $clientCredentials)
+    {
+        $keys = array('identifier', 'secret');
+
+        foreach ($keys as $key) {
+            if (!isset($clientCredentials[$key])) {
+                throw new InvalidArgumentException("Missing client credentials key [$key] from options.");
+            }
+        }
+
+        if (isset($clientCredentials['rsa_private_key']) && isset($clientCredentials['rsa_public_key'])) {
+            $_clientCredentials = new RsaClientCredentials();
+            $_clientCredentials->setRsaPrivateKey($clientCredentials['rsa_private_key']);
+            $_clientCredentials->setRsaPublicKey($clientCredentials['rsa_public_key']);
+        } else {
+            $_clientCredentials = new ClientCredentials();
+        }
+
+        $_clientCredentials->setIdentifier($clientCredentials['identifier']);
+        $_clientCredentials->setSecret($clientCredentials['secret']);
+
+        if (isset($clientCredentials['callback_uri'])) {
+            $_clientCredentials->setCallbackUri($clientCredentials['callback_uri']);
+        }
+
+        return $_clientCredentials;
     }
 }
