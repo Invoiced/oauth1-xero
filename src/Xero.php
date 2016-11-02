@@ -3,6 +3,7 @@
 namespace Invoiced\OAuth1\Client\Server;
 
 use Exception;
+use GuzzleHttp\Client as GuzzleHttpClient;
 use League\OAuth1\Client\Credentials\TokenCredentials;
 use League\OAuth1\Client\Server\Server;
 use League\OAuth1\Client\Signature\SignatureInterface;
@@ -18,6 +19,11 @@ class Xero extends Server
      * @var bool
      */
     protected $usePartnerApi = false;
+
+    /**
+     * @var array
+     */
+    protected $httpClientOptions = [];
 
     /**
      * {@inheritdoc}
@@ -53,6 +59,16 @@ class Xero extends Server
     public function getUsePartnerApi()
     {
         return $this->usePartnerApi;
+    }
+
+    /**
+     * Creates a Guzzle HTTP client for the given URL.
+     *
+     * @return GuzzleHttpClient
+     */
+    public function createHttpClient()
+    {
+        return new GuzzleHttpClient($this->httpClientOptions);
     }
 
     public function urlTemporaryCredentials()
@@ -117,6 +133,7 @@ class Xero extends Server
     {
         $configToPropertyMap = array(
             'partner' => 'usePartnerApi',
+            'http_client' => 'httpClientOptions',
         );
         foreach ($configToPropertyMap as $config => $property) {
             if (isset($configuration[$config])) {

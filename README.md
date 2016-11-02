@@ -23,11 +23,47 @@ composer require invoiced/oauth1-xero
 
 Usage is the same as The League's OAuth client, using `Invoiced\OAuth1\Client\Server\Xero` as the provider.
 
+### Public API
+
+Follows [Xero Public Applications](https://developer.xero.com/documentation/getting-started/public-applications/).
+
 ```php
 $server = new Invoiced\OAuth1\Client\Server\Xero([
     'identifier'   => 'your-identifier',
     'secret'       => 'your-secret',
     'callback_uri' => 'https://your-callback-uri/',
     'partner'      => false,
+]);
+```
+
+### Private API
+
+Follows [Xero Private Applications](https://developer.xero.com/documentation/getting-started/private-applications/).
+
+```php
+$server = new Invoiced\OAuth1\Client\Server\Xero([
+    'identifier'   => 'your-identifier',
+    'secret'       => 'your-secret',
+    'callback_uri' => 'https://your-callback-uri/',
+    'partner'      => false,
+]);
+```
+
+### Partner API
+
+Follows [Xero Partner Applications](https://developer.xero.com/documentation/getting-started/partner-applications/).
+
+```php
+$server = new Invoiced\OAuth1\Client\Server\Xero([
+    'identifier'   => 'your-identifier',
+    'secret'       => 'your-secret',
+    'callback_uri' => 'https://your-callback-uri/',
+    'partner'      => true,
+    'http_client'  => [
+        'cert'     => '/path/entrust-cert.pem',
+        'ssl_key'  => ['/path/entrust-private.pem', 'key-password'],
+        // certificate verification would require installing Xero's certificate issuer to the trust store
+        'verify'   => false,
+    ],
 ]);
 ```

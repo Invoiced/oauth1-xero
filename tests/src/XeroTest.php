@@ -13,6 +13,17 @@ class XeroTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($server->getUsePartnerApi());
     }
 
+    public function testCreateHttpClient()
+    {
+        $server = new Xero($this->getClientCredentials());
+
+        $client = $server->createHttpClient();
+        $this->assertInstanceOf('GuzzleHttp\Client', $client);
+        $this->assertEquals('/path/cert.pem', $client->getConfig('cert'));
+        $this->assertEquals('/path/key.pem', $client->getConfig('ssl_key'));
+        $this->assertFalse($client->getConfig('verify'));
+    }
+
     public function testUrlTemporaryCredentials()
     {
         $server = $this->getServer();
@@ -128,6 +139,11 @@ class XeroTest extends PHPUnit_Framework_TestCase
             'identifier' => 'app_key',
             'secret' => 'secret',
             'callback_uri' => 'https://example.com/callback',
+            'http_client' => [
+                'cert' => '/path/cert.pem',
+                'ssl_key' => '/path/key.pem',
+                'verify' => false,
+            ],
         ];
     }
 }
