@@ -1,5 +1,6 @@
 <?php
 
+use League\OAuth1\Client\Credentials\CredentialsException;
 use Invoiced\OAuth1\Client\Server\RsaClientCredentials;
 
 class RsaClientCredentialsTest extends PHPUnit_Framework_TestCase
@@ -17,7 +18,7 @@ class RsaClientCredentialsTest extends PHPUnit_Framework_TestCase
 
     public function testGetRsaPublicKeyNotExists()
     {
-        $this->setExpectedException('League\OAuth1\Client\Credentials\CredentialsException');
+        $this->setExpectedException(CredentialsException::class);
 
         $credentials = new RsaClientCredentials();
         $credentials->setRsaPublicKey('fail');
@@ -27,7 +28,7 @@ class RsaClientCredentialsTest extends PHPUnit_Framework_TestCase
 
     public function testGetRsaPublicKeyInvalid()
     {
-        $this->setExpectedException('League\OAuth1\Client\Credentials\CredentialsException');
+        $this->setExpectedException(CredentialsException::class);
 
         $credentials = new RsaClientCredentials();
         $credentials->setRsaPublicKey(__DIR__.'/test_rsa_invalidkey.pem');
@@ -48,7 +49,7 @@ class RsaClientCredentialsTest extends PHPUnit_Framework_TestCase
 
     public function testGetRsaPrivateKeyNotExists()
     {
-        $this->setExpectedException('League\OAuth1\Client\Credentials\CredentialsException');
+        $this->setExpectedException(CredentialsException::class);
 
         $credentials = new RsaClientCredentials();
         $credentials->setRsaPrivateKey('fail');
@@ -58,7 +59,7 @@ class RsaClientCredentialsTest extends PHPUnit_Framework_TestCase
 
     public function testGetRsaPrivateKeyInvalid()
     {
-        $this->setExpectedException('League\OAuth1\Client\Credentials\CredentialsException');
+        $this->setExpectedException(CredentialsException::class);
 
         $credentials = new RsaClientCredentials();
         $credentials->setRsaPrivateKey(__DIR__.'/test_rsa_invalidkey.pem');

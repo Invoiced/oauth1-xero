@@ -1,5 +1,6 @@
 <?php
 
+use League\OAuth1\Client\Credentials\ClientCredentialsInterface;
 use Invoiced\OAuth1\Client\Server\RsaClientCredentials;
 use Invoiced\OAuth1\Client\Server\RsaSha1Signature;
 
@@ -124,7 +125,7 @@ class RsaSha1SignatureTest extends PHPUnit_Framework_TestCase
 
     protected function invokeQueryStringFromData(array $args)
     {
-        $signature = new RsaSha1Signature(Mockery::mock('League\OAuth1\Client\Credentials\ClientCredentialsInterface'));
+        $signature = new RsaSha1Signature(Mockery::mock(ClientCredentialsInterface::class));
         $refl = new \ReflectionObject($signature);
         $method = $refl->getMethod('queryStringFromData');
         $method->setAccessible(true);

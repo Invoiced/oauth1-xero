@@ -1,5 +1,7 @@
 <?php
 
+use Invoiced\OAuth1\Client\Server\RsaClientCredentials;
+use Invoiced\OAuth1\Client\Server\RsaSha1Signature;
 use Invoiced\OAuth1\Client\Server\Xero;
 
 class XeroTest extends PHPUnit_Framework_TestCase
@@ -24,7 +26,7 @@ class XeroTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($client->getConfig('verify'));
     }
 
-    function testCredentialsWithRsa()
+    public function testCredentialsWithRsa()
     {
         $config = [
             'identifier' => 'app_key',
@@ -36,12 +38,12 @@ class XeroTest extends PHPUnit_Framework_TestCase
         $server = new Xero($config);
 
         $credentials = $server->getClientCredentials();
-        $this->assertInstanceOf('Invoiced\OAuth1\Client\Server\RsaClientCredentials', $credentials);
+        $this->assertInstanceOf(RsaClientCredentials::class, $credentials);
         $this->assertTrue(is_resource($credentials->getRsaPrivateKey()));
         $this->assertTrue(is_resource($credentials->getRsaPublicKey()));
 
         $signature = $server->getSignature();
-        $this->assertInstanceOf('Invoiced\OAuth1\Client\Server\RsaSha1Signature', $signature);
+        $this->assertInstanceOf(RsaSha1Signature::class, $signature);
     }
 
     public function testUrlTemporaryCredentials()
@@ -131,7 +133,7 @@ class XeroTest extends PHPUnit_Framework_TestCase
     protected function getServer()
     {
         $server = Mockery::mock(
-            'Invoiced\OAuth1\Client\Server\Xero[createHttpClient]',
+            Xero::class.'[createHttpClient]',
             [$this->getClientCredentials()]
         );
 
