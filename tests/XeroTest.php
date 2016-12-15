@@ -119,6 +119,77 @@ class XeroTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $server->getLastTokenCredentialsResponse());
     }
 
+    public function testRefreshToken()
+    {
+        $server = Mockery::mock('Invoiced\OAuth1\Client\Server\Xero[createHttpClient]', array($this->getClientCredentials()));
+        $tokenCredentials = Mockery::mock('League\OAuth1\Client\Credentials\TokenCredentials');
+        $tokenCredentials->shouldReceive('getIdentifier')
+                         ->andReturn('tokencredentialsidentifier');
+        $tokenCredentials->shouldReceive('getSecret')
+                         ->andReturn('tokencredentialssecret');
+        $server->shouldReceive('createHttpClient')
+               ->andReturn($client = Mockery::mock('stdClass'));
+        $me = $this;
+        $client->shouldReceive('post')
+                ->with('https://api.xero.com/oauth/AccessToken', Mockery::on(function ($options) use ($me) {
+            $headers = $options['headers'];
+            $body = $options['form_params'];
+            $me->assertTrue(isset($headers['Authorization']));
+            $me->assertFalse(isset($headers['User-Agent']));
+            // OAuth protocol specifies a strict number of
+            // headers should be sent, in the correct order.
+            // We'll validate that here.
+            $pattern = '/OAuth oauth_consumer_key=".*?", oauth_nonce="[a-zA-Z0-9]+", oauth_signature_method="HMAC-SHA1", oauth_timestamp="\d{10}", oauth_version="1.0", oauth_token="tokencredentialsidentifier", oauth_signature=".*?"/';
+            $matches = preg_match($pattern, $headers['Authorization']);
+            $me->assertEquals(1, $matches, 'Asserting that the authorization header contains the correct expression.');
+            $me->assertSame($body, array('oauth_session_handle' => 'mysessionhandle'));
+
+            return true;
+        }))
+                ->once()
+                ->andReturn($response = Mockery::mock('stdClass'));
+        $response->shouldReceive('getBody')
+                 ->andReturn('oauth_token=newidentifier&oauth_token_secret=newsecret');
+
+        $credentials = $server->refreshToken($tokenCredentials, 'mysessionhandle');
+
+        $this->assertInstanceOf('League\OAuth1\Client\Credentials\TokenCredentials', $credentials);
+        $this->assertEquals('newidentifier', $credentials->getIdentifier());
+        $this->assertEquals('newsecret', $credentials->getSecret());
+
+        $expected = [
+            'oauth_token' => 'newidentifier',
+            'oauth_token_secret' => 'newsecret',
+        ];
+        $this->assertEquals($expected, $server->getLastTokenCredentialsResponse());
+    }
+
+    public function testRefreshTokenFail()
+    {
+        $this->setExpectedException('League\OAuth1\Client\Credentials\CredentialsException');
+
+        $server = Mockery::mock('Invoiced\OAuth1\Client\Server\Xero[createHttpClient]', array($this->getClientCredentials()));
+        $tokenCredentials = Mockery::mock('League\OAuth1\Client\Credentials\TokenCredentials');
+        $tokenCredentials->shouldReceive('getIdentifier')
+                         ->andReturn('tokencredentialsidentifier');
+        $tokenCredentials->shouldReceive('getSecret')
+                         ->andReturn('tokencredentialssecret');
+        $server->shouldReceive('createHttpClient')
+               ->andReturn($client = Mockery::mock('stdClass'));
+        $response = Mockery::mock();
+        $response->shouldReceive('getBody')
+                 ->andReturn('fail');
+        $response->shouldReceive('getStatusCode')
+                 ->andReturn(401);
+        $e = Mockery::mock('GuzzleHttp\Exception\BadResponseException');
+        $e->shouldReceive('getResponse')
+          ->andReturn($response);
+        $client->shouldReceive('post')
+                ->andThrow($e);
+
+        $server->refreshToken($tokenCredentials, 'mysessionhandle');
+    }
+
     public function testUserDetails()
     {
         $this->setExpectedException('Exception');

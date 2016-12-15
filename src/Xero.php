@@ -4,6 +4,7 @@ namespace Invoiced\OAuth1\Client\Server;
 
 use Exception;
 use GuzzleHttp\Client as GuzzleHttpClient;
+use GuzzleHttp\Exception\BadResponseException;
 use InvalidArgumentException;
 use League\OAuth1\Client\Credentials\ClientCredentials;
 use League\OAuth1\Client\Credentials\TokenCredentials;
@@ -142,6 +143,39 @@ class Xero extends Server
     public function getLastTokenCredentialsResponse()
     {
         return $this->lastTokenCredentialsResponse;
+    }
+
+    /**
+     * Refreshes an access token. Can be used by partner applications.
+     *
+     * @param TokenCredentials $tokenCredentials
+     * @param string           $sessionHandle    Xero session handle
+     *
+     * @throws League\OAuth1\Client\Credentials\CredentialsException when the access token cannot be refreshed.
+     *
+     * @return TokenCredentials
+     */
+    public function refreshToken(TokenCredentials $tokenCredentials, $sessionHandle)
+    {
+        $client = $this->createHttpClient();
+        $url = $this->urlTokenCredentials();
+
+        $parameters = [
+            'oauth_session_handle' => $sessionHandle,
+        ];
+
+        $headers = $this->getHeaders($tokenCredentials, 'POST', $url, $parameters);
+
+        try {
+            $response = $client->post($url, [
+                'headers' => $headers,
+                'form_params' => $parameters,
+            ]);
+        } catch (BadResponseException $e) {
+            $this->handleTokenCredentialsBadResponse($e);
+        }
+
+        return $this->createTokenCredentials((string) $response->getBody());
     }
 
     protected function notSupportedByXero()
