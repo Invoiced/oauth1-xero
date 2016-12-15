@@ -28,6 +28,11 @@ class Xero extends Server
     protected $httpClientOptions = [];
 
     /**
+     * @var array
+     */
+    protected $lastTokenCredentialsResponse;
+
+    /**
      * {@inheritdoc}
      */
     public function __construct($clientCredentials, SignatureInterface $signature = null)
@@ -127,6 +132,18 @@ class Xero extends Server
         return $this->notSupportedByXero();
     }
 
+    /**
+     * Gets the response of the last access token call. This might
+     * be useful for partner applications to retrieve additional
+     * OAuth parameters passed in by Xero.
+     *
+     * @return array|null
+     */
+    public function getLastTokenCredentialsResponse()
+    {
+        return $this->lastTokenCredentialsResponse;
+    }
+
     protected function notSupportedByXero()
     {
         throw new Exception("Xero's API does not support retrieving the current user. Please see https://xero.uservoice.com/forums/5528-xero-accounting-api/suggestions/5688571-expose-which-user-connected-the-organization-via-o");
@@ -183,5 +200,20 @@ class Xero extends Server
         }
 
         return $_clientCredentials;
+    }
+
+    /**
+     * Creates token credentials from the body response.
+     *
+     * @param string $body
+     *
+     * @return TokenCredentials
+     */
+    protected function createTokenCredentials($body)
+    {
+        parse_str($body, $data);
+        $this->lastTokenCredentialsResponse = $data;
+
+        return parent::createTokenCredentials($body);
     }
 }
