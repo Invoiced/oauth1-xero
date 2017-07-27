@@ -6,6 +6,7 @@ php:
     - hhvm
 
 sudo: false
+dist: trusty
 
 before_script:
     - composer install
