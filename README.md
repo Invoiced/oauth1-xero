@@ -25,7 +25,7 @@ Usage is the same as The League's OAuth client, using `Invoiced\OAuth1\Client\Se
 
 ### Public API
 
-Follows [Xero Public Applications](https://developer.xero.com/documentation/getting-started/public-applications/).
+Follows [Xero Public Applications](https://developer.xero.com/documentation/auth-and-limits/public-applications).
 
 ```php
 $server = new Invoiced\OAuth1\Client\Server\Xero([
@@ -38,7 +38,7 @@ $server = new Invoiced\OAuth1\Client\Server\Xero([
 
 ### Private API
 
-Follows [Xero Private Applications](https://developer.xero.com/documentation/getting-started/private-applications/).
+Follows [Xero Private Applications](https://developer.xero.com/documentation/auth-and-limits/private-applications).
 
 ```php
 $server = new Invoiced\OAuth1\Client\Server\Xero([
@@ -53,7 +53,7 @@ $server = new Invoiced\OAuth1\Client\Server\Xero([
 
 ### Partner API
 
-Follows [Xero Partner Applications](https://developer.xero.com/documentation/getting-started/partner-applications/).
+Follows [Xero Partner Applications](https://developer.xero.com/documentation/auth-and-limits/partner-applications).
 
 ```php
 $server = new Invoiced\OAuth1\Client\Server\Xero([
