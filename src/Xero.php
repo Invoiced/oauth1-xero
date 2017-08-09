@@ -34,6 +34,11 @@ class Xero extends Server
     protected $lastTokenCredentialsResponse;
 
     /**
+     * @var array
+     */
+    protected $scope = [];
+
+    /**
      * {@inheritdoc}
      */
     public function __construct($clientCredentials, SignatureInterface $signature = null)
@@ -76,6 +81,17 @@ class Xero extends Server
     }
 
     /**
+     * Sets the value of the scope parameter used during authorization.
+     *
+     * @param array $scope Enumerated array where each element is a string
+     *        containing a single privilege value (e.g. 'payroll.employees')
+     */
+    public function setScope(array $scope)
+    {
+        $this->scope = $scope;
+    }
+
+    /**
      * Creates a Guzzle HTTP client for the given URL.
      *
      * @return GuzzleHttpClient
@@ -96,7 +112,19 @@ class Xero extends Server
 
     public function urlAuthorization()
     {
-        return 'https://api.xero.com/oauth/Authorize';
+        return 'https://api.xero.com/oauth/Authorize'
+            . $this->buildUrlAuthorizationQueryString();
+    }
+
+    /**
+     * @return string
+     */
+    protected function buildUrlAuthorizationQueryString()
+    {
+        if (!$this->scope) {
+            return '';
+        }
+        return '?scope=' . implode(',', $this->scope);
     }
 
     public function urlTokenCredentials()
