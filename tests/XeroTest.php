@@ -64,6 +64,12 @@ class XeroTest extends PHPUnit_Framework_TestCase
 
         $server->usePartnerApi();
         $this->assertEquals('https://api.xero.com/oauth/Authorize', $server->urlAuthorization());
+
+        $server->setScope(['payroll.employees', 'payroll.payitems']);
+        $this->assertEquals(
+            'https://api.xero.com/oauth/Authorize?scope=payroll.employees,payroll.payitems',
+            $server->urlAuthorization()
+        );
     }
 
     public function testUrlTokenCredentials()
