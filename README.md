@@ -60,14 +60,7 @@ $server = new Invoiced\OAuth1\Client\Server\Xero([
     'identifier'      => 'your-identifier',
     'secret'          => 'your-secret',
     'callback_uri'    => 'https://your-callback-uri/',
-    'partner'         => true,
     'rsa_private_key' => '/path/private.pem',
     'rsa_public_key'  => '/path/public.pem',
-    'http_client'     => [
-        'cert'     => '/path/entrust-cert.pem',
-        'ssl_key'  => ['/path/entrust-private.pem', 'key-password'],
-        // certificate verification would require installing Xero's certificate issuer to the trust store
-        'verify'   => false,
-    ],
 ]);
 ```
