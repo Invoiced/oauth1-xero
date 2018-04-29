@@ -6,15 +6,6 @@ use Invoiced\OAuth1\Client\Server\Xero;
 
 class XeroTest extends PHPUnit_Framework_TestCase
 {
-    public function testUsePartnerApi()
-    {
-        $server = $this->getServer();
-
-        $this->assertFalse($server->getUsePartnerApi());
-        $this->assertEquals($server, $server->usePartnerApi());
-        $this->assertTrue($server->getUsePartnerApi());
-    }
-
     public function testCreateHttpClient()
     {
         $server = new Xero($this->getClientCredentials());
@@ -51,18 +42,12 @@ class XeroTest extends PHPUnit_Framework_TestCase
         $server = $this->getServer();
 
         $this->assertEquals('https://api.xero.com/oauth/RequestToken', $server->urlTemporaryCredentials());
-
-        $server->usePartnerApi();
-        $this->assertEquals('https://api-partner.network.xero.com/oauth/RequestToken', $server->urlTemporaryCredentials());
     }
 
     public function testUrlAuthorization()
     {
         $server = $this->getServer();
 
-        $this->assertEquals('https://api.xero.com/oauth/Authorize', $server->urlAuthorization());
-
-        $server->usePartnerApi();
         $this->assertEquals('https://api.xero.com/oauth/Authorize', $server->urlAuthorization());
 
         $server->setScope(['payroll.employees', 'payroll.payitems']);
@@ -77,14 +62,11 @@ class XeroTest extends PHPUnit_Framework_TestCase
         $server = $this->getServer();
 
         $this->assertEquals('https://api.xero.com/oauth/AccessToken', $server->urlTokenCredentials());
-
-        $server->usePartnerApi();
-        $this->assertEquals('https://api-partner.network.xero.com/oauth/AccessToken', $server->urlTokenCredentials());
     }
 
     public function testGetTokenCredentials()
     {
-        $server = Mockery::mock('Invoiced\OAuth1\Client\Server\Xero[createHttpClient]', array($this->getClientCredentials()));
+        $server = Mockery::mock('Invoiced\OAuth1\Client\Server\Xero[createHttpClient]', [$this->getClientCredentials()]);
         $temporaryCredentials = Mockery::mock('League\OAuth1\Client\Credentials\TemporaryCredentials');
         $temporaryCredentials->shouldReceive('getIdentifier')
                              ->andReturn('temporarycredentialsidentifier');
@@ -95,20 +77,20 @@ class XeroTest extends PHPUnit_Framework_TestCase
         $me = $this;
         $client->shouldReceive('post')
                 ->with('https://api.xero.com/oauth/AccessToken', Mockery::on(function ($options) use ($me) {
-            $headers = $options['headers'];
-            $body = $options['form_params'];
-            $me->assertTrue(isset($headers['Authorization']));
-            $me->assertFalse(isset($headers['User-Agent']));
-            // OAuth protocol specifies a strict number of
-            // headers should be sent, in the correct order.
-            // We'll validate that here.
-            $pattern = '/OAuth oauth_consumer_key=".*?", oauth_nonce="[a-zA-Z0-9]+", oauth_signature_method="HMAC-SHA1", oauth_timestamp="\d{10}", oauth_version="1.0", oauth_token="temporarycredentialsidentifier", oauth_signature=".*?"/';
-            $matches = preg_match($pattern, $headers['Authorization']);
-            $me->assertEquals(1, $matches, 'Asserting that the authorization header contains the correct expression.');
-            $me->assertSame($body, array('oauth_verifier' => 'myverifiercode'));
+                    $headers = $options['headers'];
+                    $body = $options['form_params'];
+                    $me->assertTrue(isset($headers['Authorization']));
+                    $me->assertFalse(isset($headers['User-Agent']));
+                    // OAuth protocol specifies a strict number of
+                    // headers should be sent, in the correct order.
+                    // We'll validate that here.
+                    $pattern = '/OAuth oauth_consumer_key=".*?", oauth_nonce="[a-zA-Z0-9]+", oauth_signature_method="HMAC-SHA1", oauth_timestamp="\d{10}", oauth_version="1.0", oauth_token="temporarycredentialsidentifier", oauth_signature=".*?"/';
+                    $matches = preg_match($pattern, $headers['Authorization']);
+                    $me->assertEquals(1, $matches, 'Asserting that the authorization header contains the correct expression.');
+                    $me->assertSame($body, ['oauth_verifier' => 'myverifiercode']);
 
-            return true;
-        }))
+                    return true;
+                }))
                 ->once()
                 ->andReturn($response = Mockery::mock('stdClass'));
         $response->shouldReceive('getBody')
@@ -127,7 +109,7 @@ class XeroTest extends PHPUnit_Framework_TestCase
 
     public function testRefreshToken()
     {
-        $server = Mockery::mock('Invoiced\OAuth1\Client\Server\Xero[createHttpClient]', array($this->getClientCredentials()));
+        $server = Mockery::mock('Invoiced\OAuth1\Client\Server\Xero[createHttpClient]', [$this->getClientCredentials()]);
         $tokenCredentials = Mockery::mock('League\OAuth1\Client\Credentials\TokenCredentials');
         $tokenCredentials->shouldReceive('getIdentifier')
                          ->andReturn('tokencredentialsidentifier');
@@ -138,20 +120,20 @@ class XeroTest extends PHPUnit_Framework_TestCase
         $me = $this;
         $client->shouldReceive('post')
                 ->with('https://api.xero.com/oauth/AccessToken', Mockery::on(function ($options) use ($me) {
-            $headers = $options['headers'];
-            $body = $options['form_params'];
-            $me->assertTrue(isset($headers['Authorization']));
-            $me->assertFalse(isset($headers['User-Agent']));
-            // OAuth protocol specifies a strict number of
-            // headers should be sent, in the correct order.
-            // We'll validate that here.
-            $pattern = '/OAuth oauth_consumer_key=".*?", oauth_nonce="[a-zA-Z0-9]+", oauth_signature_method="HMAC-SHA1", oauth_timestamp="\d{10}", oauth_version="1.0", oauth_token="tokencredentialsidentifier", oauth_signature=".*?"/';
-            $matches = preg_match($pattern, $headers['Authorization']);
-            $me->assertEquals(1, $matches, 'Asserting that the authorization header contains the correct expression.');
-            $me->assertSame($body, array('oauth_session_handle' => 'mysessionhandle'));
+                    $headers = $options['headers'];
+                    $body = $options['form_params'];
+                    $me->assertTrue(isset($headers['Authorization']));
+                    $me->assertFalse(isset($headers['User-Agent']));
+                    // OAuth protocol specifies a strict number of
+                    // headers should be sent, in the correct order.
+                    // We'll validate that here.
+                    $pattern = '/OAuth oauth_consumer_key=".*?", oauth_nonce="[a-zA-Z0-9]+", oauth_signature_method="HMAC-SHA1", oauth_timestamp="\d{10}", oauth_version="1.0", oauth_token="tokencredentialsidentifier", oauth_signature=".*?"/';
+                    $matches = preg_match($pattern, $headers['Authorization']);
+                    $me->assertEquals(1, $matches, 'Asserting that the authorization header contains the correct expression.');
+                    $me->assertSame($body, ['oauth_session_handle' => 'mysessionhandle']);
 
-            return true;
-        }))
+                    return true;
+                }))
                 ->once()
                 ->andReturn($response = Mockery::mock('stdClass'));
         $response->shouldReceive('getBody')
@@ -174,7 +156,7 @@ class XeroTest extends PHPUnit_Framework_TestCase
     {
         $this->setExpectedException('League\OAuth1\Client\Credentials\CredentialsException');
 
-        $server = Mockery::mock('Invoiced\OAuth1\Client\Server\Xero[createHttpClient]', array($this->getClientCredentials()));
+        $server = Mockery::mock('Invoiced\OAuth1\Client\Server\Xero[createHttpClient]', [$this->getClientCredentials()]);
         $tokenCredentials = Mockery::mock('League\OAuth1\Client\Credentials\TokenCredentials');
         $tokenCredentials->shouldReceive('getIdentifier')
                          ->andReturn('tokencredentialsidentifier');

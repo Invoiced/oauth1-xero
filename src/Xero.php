@@ -19,11 +19,6 @@ class Xero extends Server
     protected $responseType = 'xml';
 
     /**
-     * @var bool
-     */
-    protected $usePartnerApi = false;
-
-    /**
      * @var array
      */
     protected $httpClientOptions = [];
@@ -57,30 +52,6 @@ class Xero extends Server
     }
 
     /**
-     * Sets whether the Xero partner API should be used.
-     *
-     * @param bool $enable
-     *
-     * @return self
-     */
-    public function usePartnerApi($enable = true)
-    {
-        $this->usePartnerApi = $enable;
-
-        return $this;
-    }
-
-    /**
-     * Checks if the Xero partner API is used.
-     *
-     * @return bool
-     */
-    public function getUsePartnerApi()
-    {
-        return $this->usePartnerApi;
-    }
-
-    /**
      * Sets the value of the scope parameter used during authorization.
      *
      * @param array $scope Enumerated array where each element is a string
@@ -103,10 +74,6 @@ class Xero extends Server
 
     public function urlTemporaryCredentials()
     {
-        if ($this->usePartnerApi) {
-            return 'https://api-partner.network.xero.com/oauth/RequestToken';
-        }
-
         return 'https://api.xero.com/oauth/RequestToken';
     }
 
@@ -130,10 +97,6 @@ class Xero extends Server
 
     public function urlTokenCredentials()
     {
-        if ($this->usePartnerApi) {
-            return 'https://api-partner.network.xero.com/oauth/AccessToken';
-        }
-
         return 'https://api.xero.com/oauth/AccessToken';
     }
 
@@ -220,7 +183,6 @@ class Xero extends Server
     private function parseConfiguration(array $configuration = [])
     {
         $configToPropertyMap = [
-            'partner' => 'usePartnerApi',
             'http_client' => 'httpClientOptions',
         ];
         foreach ($configToPropertyMap as $config => $property) {

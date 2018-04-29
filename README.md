@@ -45,7 +45,6 @@ $server = new Invoiced\OAuth1\Client\Server\Xero([
     'identifier'      => 'your-identifier',
     'secret'          => 'your-secret',
     'callback_uri'    => 'https://your-callback-uri/',
-    'partner'         => false,
     'rsa_private_key' => '/path/private.pem',
     'rsa_public_key'  => '/path/public.pem',
 ]);
