@@ -84,7 +84,7 @@ class Xero extends Server
      * Sets the value of the scope parameter used during authorization.
      *
      * @param array $scope Enumerated array where each element is a string
-     *        containing a single privilege value (e.g. 'payroll.employees')
+     *                     containing a single privilege value (e.g. 'payroll.employees')
      */
     public function setScope(array $scope)
     {
@@ -113,7 +113,7 @@ class Xero extends Server
     public function urlAuthorization()
     {
         return 'https://api.xero.com/oauth/Authorize'
-            . $this->buildUrlAuthorizationQueryString();
+            .$this->buildUrlAuthorizationQueryString();
     }
 
     /**
@@ -124,7 +124,8 @@ class Xero extends Server
         if (!$this->scope) {
             return '';
         }
-        return '?scope=' . implode(',', $this->scope);
+
+        return '?scope='.implode(',', $this->scope);
     }
 
     public function urlTokenCredentials()
@@ -179,7 +180,7 @@ class Xero extends Server
      * @param TokenCredentials $tokenCredentials
      * @param string           $sessionHandle    Xero session handle
      *
-     * @throws League\OAuth1\Client\Credentials\CredentialsException when the access token cannot be refreshed.
+     * @throws \League\OAuth1\Client\Credentials\CredentialsException when the access token cannot be refreshed
      *
      * @return TokenCredentials
      */
@@ -216,12 +217,12 @@ class Xero extends Server
      *
      * @param array $configuration
      */
-    private function parseConfiguration(array $configuration = array())
+    private function parseConfiguration(array $configuration = [])
     {
-        $configToPropertyMap = array(
+        $configToPropertyMap = [
             'partner' => 'usePartnerApi',
             'http_client' => 'httpClientOptions',
-        );
+        ];
         foreach ($configToPropertyMap as $config => $property) {
             if (isset($configuration[$config])) {
                 $this->$property = $configuration[$config];
@@ -238,7 +239,7 @@ class Xero extends Server
      */
     protected function createClientCredentials(array $clientCredentials)
     {
-        $keys = array('identifier', 'secret');
+        $keys = ['identifier', 'secret'];
 
         foreach ($keys as $key) {
             if (!isset($clientCredentials[$key])) {
