@@ -89,6 +89,9 @@ class Xero extends Server
     protected function buildUrlAuthorizationQueryString(bool $redirectOnError = false)
     {
         if (!$this->scope) {
+            if (!$redirectOnError) {
+                return '';
+            }
             $parameters = '?';
         }
 
@@ -98,7 +101,7 @@ class Xero extends Server
             if ($this->scope) {
                 $parameters .= '&';
             }
-            
+
             $parameters .= 'redirectOnError=true';
         }
 
