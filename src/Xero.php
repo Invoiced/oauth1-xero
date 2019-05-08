@@ -34,6 +34,11 @@ class Xero extends Server
     protected $scope = [];
 
     /**
+     * @var bool
+     */
+    protected $redirectOnError = false;
+
+    /**
      * {@inheritdoc}
      */
     public function __construct($clientCredentials, SignatureInterface $signature = null)
@@ -86,26 +91,21 @@ class Xero extends Server
     /**
      * @return string
      */
-    protected function buildUrlAuthorizationQueryString(bool $redirectOnError = false)
+    protected function buildUrlAuthorizationQueryString()
     {
-        if (!$this->scope) {
-            if (!$redirectOnError) {
-                return '';
-            }
-            $parameters = '?';
+        if (!$this->scope && !$this->redirectOnError) {
+            return '';
         }
 
-        $parameters = '?scope='.implode(',', $this->scope);
-
-        if ($redirectOnError) {
-            if ($this->scope) {
-                $parameters .= '&';
-            }
-
-            $parameters .= 'redirectOnError=true';
+        if ($this->scope) {
+            $parameters[] = 'scope='.implode(',', $this->scope);
         }
 
-        return $parameters;
+        if ($this->redirectOnError) {
+            $parameters[] = 'redirectOnError=true';
+        }
+
+        return '?'.implode('&', $parameters);
     }
 
     public function urlTokenCredentials()
