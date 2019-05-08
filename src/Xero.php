@@ -86,13 +86,23 @@ class Xero extends Server
     /**
      * @return string
      */
-    protected function buildUrlAuthorizationQueryString()
+    protected function buildUrlAuthorizationQueryString(bool $redirectOnError = false)
     {
         if (!$this->scope) {
-            return '';
+            $parameters = '?';
         }
 
-        return '?scope='.implode(',', $this->scope);
+        $parameters = '?scope='.implode(',', $this->scope);
+
+        if ($redirectOnError) {
+            if ($this->scope) {
+                $parameters .= '&';
+            }
+            
+            $parameters .= 'redirectOnError=true';
+        }
+
+        return $parameters;
     }
 
     public function urlTokenCredentials()
