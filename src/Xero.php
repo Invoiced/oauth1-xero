@@ -68,6 +68,17 @@ class Xero extends Server
     }
 
     /**
+     * Sets the redirect on error parameter used during authorization.
+     *
+     * @param boolean $redirect Boolean to toggle this parameter.
+     * @return void
+     */
+    public function setRedirectOnError(bool $redirect)
+    {
+        $this->redirectOnError = $redirect;
+    }
+
+    /**
      * Creates a Guzzle HTTP client for the given URL.
      *
      * @return GuzzleHttpClient
