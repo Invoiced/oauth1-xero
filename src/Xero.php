@@ -70,7 +70,7 @@ class Xero extends Server
     /**
      * Sets the redirect on error parameter used during authorization.
      *
-     * @param boolean $redirect Boolean to toggle this parameter.
+     * @param bool $redirect Boolean to toggle this parameter.
      * @return void
      */
     public function setRedirectOnError(bool $redirect)
@@ -81,7 +81,7 @@ class Xero extends Server
     /**
      * Gets the current setting for redirect on error.
      *
-     * @return boolean
+     * @return bool
      */
     public function getRedirectOnError()
     {
