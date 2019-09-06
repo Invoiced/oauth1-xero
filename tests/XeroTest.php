@@ -271,7 +271,7 @@ class XeroTest extends PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testredirectOnErrorIsTrue()
+    public function testRedirectOnErrorIsTrue()
     {
         $server = Mockery::mock('Invoiced\OAuth1\Client\Server\Xero[createHttpClient]', [$this->getClientCredentials()]);
         $server->setRedirectOnError(true);
@@ -279,7 +279,7 @@ class XeroTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($assertion, true);
     }
 
-    public function testredirectOnErrorIsFalse()
+    public function testRedirectOnErrorIsFalse()
     {
         $server = Mockery::mock('Invoiced\OAuth1\Client\Server\Xero[createHttpClient]', [$this->getClientCredentials()]);
         $assertion = $server->getRedirectOnError();
