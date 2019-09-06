@@ -3,13 +3,13 @@
 namespace Invoiced\OAuth1\Client\Server;
 
 use Exception;
+use InvalidArgumentException;
+use League\OAuth1\Client\Server\Server;
 use GuzzleHttp\Client as GuzzleHttpClient;
 use GuzzleHttp\Exception\BadResponseException;
-use InvalidArgumentException;
-use League\OAuth1\Client\Credentials\ClientCredentials;
 use League\OAuth1\Client\Credentials\TokenCredentials;
-use League\OAuth1\Client\Server\Server;
 use League\OAuth1\Client\Signature\SignatureInterface;
+use League\OAuth1\Client\Credentials\ClientCredentials;
 
 class Xero extends Server
 {
@@ -32,6 +32,11 @@ class Xero extends Server
      * @var array
      */
     protected $scope = [];
+
+    /**
+     * @var bool
+     */
+    protected $redirectOnError = false;
 
     /**
      * {@inheritdoc}
@@ -63,6 +68,28 @@ class Xero extends Server
     }
 
     /**
+     * Sets the redirect on error parameter used during authorization.
+     *
+     * @param boolean $redirect Boolean to toggle this parameter.
+     * 
+     * @return void
+     */
+    public function setRedirectOnError($redirect)
+    {
+        $this->redirectOnError = $redirect;
+    }
+
+    /**
+     * Gets the current setting for redirect on error.
+     *
+     * @return boolean
+     */
+    public function getRedirectOnError()
+    {
+        return $this->redirectOnError;
+    }
+
+    /**
      * Creates a Guzzle HTTP client for the given URL.
      *
      * @return GuzzleHttpClient
@@ -80,7 +107,7 @@ class Xero extends Server
     public function urlAuthorization()
     {
         return 'https://api.xero.com/oauth/Authorize'
-            .$this->buildUrlAuthorizationQueryString();
+            . $this->buildUrlAuthorizationQueryString();
     }
 
     /**
@@ -88,11 +115,19 @@ class Xero extends Server
      */
     protected function buildUrlAuthorizationQueryString()
     {
-        if (!$this->scope) {
+        if (!$this->scope && !$this->redirectOnError) {
             return '';
         }
 
-        return '?scope='.implode(',', $this->scope);
+        if ($this->scope) {
+            $parameters[] = 'scope=' . implode(',', $this->scope);
+        }
+
+        if ($this->redirectOnError) {
+            $parameters[] = 'redirectOnError=true';
+        }
+
+        return '?' . implode('&', $parameters);
     }
 
     public function urlTokenCredentials()
