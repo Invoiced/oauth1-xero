@@ -74,7 +74,7 @@ class Xero extends Server
      * 
      * @return void
      */
-    public function setRedirectOnError(bool $redirect)
+    public function setRedirectOnError($redirect)
     {
         $this->redirectOnError = $redirect;
     }
